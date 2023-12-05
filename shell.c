@@ -7,6 +7,11 @@ int main(void)
 {
 	char buffer[BUFFER_SIZE];
 
+	/*Set up the PATH environment variable*/
+	char *path = "/bin:/usr/bin"; /*Update with your desired PATH*/
+
+	setenv("PATH", path, 1);
+
 	while (1)
 	{
 		display_prompt();
