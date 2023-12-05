@@ -1,5 +1,4 @@
 #include "shell.h"
-
 /**
  * main - entry point
  * Return: always 0
@@ -7,6 +6,7 @@
 int main(void)
 {
 	char buffer[BUFFER_SIZE];
+	pid_t pid;
 
 	while (1)
 	{
@@ -14,13 +14,14 @@ int main(void)
 
 		if (fgets(buffer, sizeof(buffer), stdin) == NULL)
 		{
-			write(STDOUT_FILENO, "\n", 1);
+			write(STDOUT_FILENO, "\n", 1); /*Handle Ctrl+D (EOF)*/
 			break;
 		}
 
+		/*Remove the newline character*/
 		buffer[strcspn(buffer, "\n")] = '\0';
 
-		pid_t pid = fork();
+		pid = fork();
 
 		if (pid == -1)
 		{
@@ -28,7 +29,7 @@ int main(void)
 			exit(EXIT_FAILURE);
 		}
 
-		if (pid == 0)
+		if (pid == 0) /*Child process*/
 		{
 			if (execlp(buffer, buffer, (char *)NULL) == -1)
 			{
@@ -36,7 +37,7 @@ int main(void)
 				exit(EXIT_FAILURE);
 			}
 		}
-		else
+		else /*parent process*/
 		{
 			waitpid(pid, NULL, 0);
 		}
