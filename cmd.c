@@ -22,10 +22,20 @@ void execute_command(char *buffer)
 
 		tokenize_input(buffer, args);
 
-		/*Execute the command with arguments*/
-		if (execvp(args[0], args) == -1)
+		/*Check if the command exists in the PATH*/
+		if (access(args[0], X_OK) == 0)
 		{
-			perror("Command not found");
+			/*Execute the command with arguments*/
+			if (execve(args[0], args, NULL) == -1)
+			{
+				perror("Execution error");
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+		{
+			/*Command not found in the PATH*/
+			write(STDERR_FILENO, "Command not found\n", 18);
 			exit(EXIT_FAILURE);
 		}
 	}

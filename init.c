@@ -5,6 +5,7 @@
  * Uses strtok to split the string based on spaces.
  * @buffer: The input string to be tokenized.
  * @args: An array to store the resulting tokens.
+ * Return: no return
  */
 void tokenize_input(char *buffer, char **args)
 {
