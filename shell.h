@@ -13,5 +13,6 @@
 void display_prompt(void);
 void execute_command(char *buffer);
 void tokenize_input(char *buffer, char **args);
+int find_executable(char *command);
 
 #endif
