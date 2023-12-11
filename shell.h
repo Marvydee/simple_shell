@@ -11,8 +11,8 @@
 #define BUFFER_SIZE 1024
 
 void display_prompt(void);
-void execute_command(char *buffer);
-void tokenize_input(char *buffer, char **args);
+void execute_command(char *command);
+void tokenize_input(char *input, char *args[]);
 int find_executable(char *command);
 
 #endif
