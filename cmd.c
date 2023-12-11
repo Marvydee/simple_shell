@@ -1,12 +1,11 @@
 #include "shell.h"
 
 /**
- * execute_command - execute a command with arguments.
- * Forks a child process and uses execvp to execute the command.
- * @buffer: input command string
- * Return: no return
+ * execute_command - Executes the specified command.
+ * @command: The command to execute.
+ * Return: No return value.
  */
-void execute_command(char *buffer)
+void execute_command(char *command)
 {
 	pid_t pid = fork();
 
@@ -16,32 +15,17 @@ void execute_command(char *buffer)
 		exit(EXIT_FAILURE);
 	}
 
-	if (pid == 0) /*Child process*/
+	if (pid == 0)
 	{
-		char *args[BUFFER_SIZE];
-
-		tokenize_input(buffer, args);
-
-		/*Check if the command exists in the PATH*/
-		if (access(args[0], X_OK) == 0)
+		/* Implementation of child process */
+		if (execve(command, args, NULL) == -1)
 		{
-			/*Execute the command with arguments*/
-			if (execve(args[0], args, NULL) == -1)
-			{
-				perror("Execution error");
-				exit(EXIT_FAILURE);
-			}
-		}
-		else
-		{
-			/*Command not found in the PATH*/
-			write(STDERR_FILENO, "Command not found\n", 18);
+			perror("Execution error");
 			exit(EXIT_FAILURE);
 		}
 	}
-	else /*Parent process*/
+	else
 	{
 		waitpid(pid, NULL, 0);
 	}
 }
-
