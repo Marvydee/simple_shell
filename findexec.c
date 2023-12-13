@@ -1,4 +1,5 @@
 #include "shell.h"
+
 /**
  * find_executable - Finds the full path of the executable command.
  * @command: The command to find.
@@ -6,13 +7,23 @@
  */
 int find_executable(char *command)
 {
-	if (access(command, X_OK) == 0)
+	char *path;
+	char *token;
+
+	if (command == NULL)
 	{
-		return (1); /* Executable found in the current directory */
+		fprintf(stderr, "Invalid command\n");
+		exit(EXIT_FAILURE);
+	}
+	path = getenv("PATH");
+
+	if (path == NULL)
+	{
+		fprintf(stderr, "PATH environment variable is not set\n");
+		exit(EXIT_FAILURE);
 	}
 
-	char *path = getenv("PATH");
-	char *token = strtok(path, ":");
+	token = strtok(path, ":");
 
 	while (token != NULL)
 	{
@@ -23,7 +34,6 @@ int find_executable(char *command)
 			perror("Memory allocation error");
 			exit(EXIT_FAILURE);
 		}
-
 		sprintf(executable_path, "%s/%s", token, command);
 
 		if (access(executable_path, X_OK) == 0)
@@ -35,6 +45,6 @@ int find_executable(char *command)
 		free(executable_path);
 		token = strtok(NULL, ":");
 	}
-
-	return (0); /* Executable not found in any PATH directory */
+	return (0);
 }
+
