@@ -1,51 +1,85 @@
-#include "shell.h"
-#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
-/**
- * main - Entry point for the shell program.
- * Return: Always 0.
- */
-int main(void)
-{
+#include <unistd.h>
+
+#define BUFFER_SIZE 256
+
+extern char **environ;  // Ensure environ is declared
+
+int main(void) {
 	char buffer[BUFFER_SIZE];
-	char *path = "/bin:/usr/bin"; /* Update with your desired PATH */
-	size_t len;
+	char *args[BUFFER_SIZE];
+	int argc = 0;
+	char *path = getenv("PATH");
 
-	if (setenv("PATH", path, 1) != 0)
-	{
-		perror("Error setting PATH");
-		return (1);
-	}
-	while (1)
-	{
-		display_prompt();
-		if (fgets(buffer, sizeof(buffer), stdin) == NULL)
-		{
-			write(STDOUT_FILENO, "\n", 1); /* Handle Ctrl+D (EOF) */
-			break;
-		}
-		len = strlen(buffer);
-		if (len > 0 && buffer[len - 1] == '\n')
-		{
-			buffer[len - 1] = '\0'; /* Remove the newline character */
-		}
-		if (strcmp(buffer, "env") == 0)
-		{
-			char **env = environ;
+	while (1) {
+		// Display prompt
+		printf("($) ");
 
-			while (*env != NULL)
-			{
-				write(STDOUT_FILENO, *env, strlen(*env));
-				write(STDOUT_FILENO, "\n", 1);
-				env++;
+		// Read user input
+		if (fgets(buffer, sizeof(buffer), stdin) == NULL) {
+			if (feof(stdin)) {
+				printf("\n");
+				exit(EXIT_SUCCESS);
+			} else {
+				perror("fgets error");
+				exit(EXIT_FAILURE);
 			}
-		else if ((strcmp(buffer, "exit") == 0)
-				exit(0);
 		}
-		else
-		{
-			execute_command(buffer);
+
+		// Remove newline character
+		buffer[strcspn(buffer, "\n")] = '\0';
+
+		// Parse arguments
+		char *token = strtok(buffer, " ");
+		while (token) {
+			args[argc++] = token;
+			token = strtok(NULL, " ");
 		}
+		args[argc] = NULL;
+
+		// Check for built-ins
+		if (strcmp(args[0], "exit") == 0) {
+			exit(EXIT_SUCCESS);
+		} else if (strcmp(args[0], "env") == 0) {
+			// Print environment variables
+			for (int i = 0; environ[i]; ++i) {
+				printf("%s\n", environ[i]);
+			}
+		} else if (strcmp(args[0], "cd") == 0) {
+			// Implement cd functionality (optional)
+		} else {
+			// Handle non-built-in commands
+			int found = 0;
+			if (path) {
+				char *path_copy = strdup(path);
+				char *path_token = strtok(path_copy, ":");
+				while (path_token && !found) {
+					char full_path[BUFFER_SIZE];
+					snprintf(full_path, sizeof(full_path), "%s/%s", path_token, args[0]);
+					if (access(full_path, X_OK) == 0) {
+						args[0] = full_path;
+						found = 1;
+					}
+					path_token = strtok(NULL, ":");
+				}
+				free(path_copy);
+			}
+
+			if (found) {
+				if (execve(args[0], args, environ) == -1) {
+					perror("execve error");
+				}
+			} else {
+				printf("%s: command not found\n", args[0]);
+			}
+		}
+
+		// Reset arguments
+		argc = 0;
 	}
-	return (0);
+
+	return 0;
 }
+
