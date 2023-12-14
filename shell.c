@@ -37,6 +37,8 @@ int main(void)
 				write(STDOUT_FILENO, "\n", 1);
 				env++;
 			}
+		else if ((strcmp(buffer, "exit") == 0)
+				exit(0);
 		}
 		else
 		{
