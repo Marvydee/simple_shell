@@ -104,8 +104,8 @@ char *find_path(info_t *, char *, char *);
 int loophsh(char **);
 
 /* toem_errors.c */
-void _eputs(char *);
-int _eputchar(char);
+void _sputs(char *);
+int _sputchar(char);
 int _putfd(char c, int fd);
 int _putsfd(char *str, int fd);
 
@@ -146,10 +146,10 @@ int _atoi(char *);
 
 /* toem_errors1.c */
 int _erratoi(char *);
-void print_error(info_t *, char *);
+void print_err(info_t *, char *);
 int print_d(int, int);
-char *convert_number(long int, int, int);
-void remove_comments(char *);
+char *conv_num(long int, int, int);
+void rmv_comments(char *);
 
 /* toem_builtin.c */
 int _exit(info_t *);
@@ -175,7 +175,7 @@ char *_getenv(info_t *, const char *);
 int _env(info_t *);
 int _setenv(info_t *);
 int _unsetenv(info_t *);
-int populate_env_list(info_t *);
+int pop_env_list(info_t *);
 
 /* toem_getenv.c */
 char **get_environ(info_t *);

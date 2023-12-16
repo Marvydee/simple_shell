@@ -14,7 +14,7 @@ void _sputs(char *str)
 		return;
 	while (str[i] != '\0')
 	{
-		_eputchar(str[i]);
+		_sputchar(str[i]);
 		i++;
 	}
 }
