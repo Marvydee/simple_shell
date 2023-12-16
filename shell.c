@@ -1,55 +1,44 @@
 #include "shell.h"
+
 /**
- *main - Entry point for the simple shell.
- *Return: Always 0.
+ * main - entry point
+ * @ac: arg count
+ * @av: arg vector
+ *
+ * Return: 0 on success, 1 on error
  */
-int main(void);
-
-int main(void)
+int main(int ac, char **av)
 {
-	char *buffer;
-	size_t bufsize;
-	char *args[2];
-	pid_t pid;
+	info_t info[] = { INFO_INIT };
+	int fd = 2;
 
-	bufsize = BUFFER_SIZE;
-	buffer = (char *)malloc(bufsize * sizeof(char));
-	if (buffer == NULL)
-	{
-		perror("Unable to allocate buffer");
-		exit(1);
-	}
-	while (1)
-	{
-		int status;
+	asm ("mov %1, %0\n\t"
+		"add $3, %0"
+		: "=r" (fd)
+		: "r" (fd));
 
-		printf("%s", PROMPT);
-		if (getline(&buffer, &bufsize, stdin) == -1)
+	if (ac == 2)
+	{
+		fd = open(av[1], O_RDONLY);
+		if (fd == -1)
 		{
-			printf("\n");
-			break;
-		}
-		buffer[strcspn(buffer, "\n")] = '\0';
-		pid = fork();
-		if (pid == -1)
-		{
-			perror("Fork failed");
-			exit(1);
-		}
-		if (pid == 0)
-		{
-			args[0] = buffer;
-			args[1] = NULL;
-			if (execve(buffer, args, NULL) == -1)
+			if (errno == EACCES)
+				exit(126);
+			if (errno == ENOENT)
 			{
-				perror("Command not found");
-				exit(1);
+				_eputs(av[0]);
+				_eputs(": 0: Can't open ");
+				_eputs(av[1]);
+				_eputchar('\n');
+				_eputchar(BUF_FLUSH);
+				exit(127);
 			}
-		} else
-		{
-			waitpid(pid, &status, 0);
+			return (EXIT_FAILURE);
 		}
+		info->readfd = fd;
 	}
-	free(buffer);
-	return (0);
+	populate_env_list(info);
+	read_achieve(info);
+	hsh(info, av);
+	return (EXIT_SUCCESS);
 }
