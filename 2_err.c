@@ -29,21 +29,21 @@ int _erratoi(char *s)
 }
 
 /**
- * print_err - prints an error message
+ * print_error - prints an error message
  * @info: the parameter & return info struct
  * @estr: string containing specified error type
  * Return: 0 if no numbers in string, converted number otherwise
  *        -1 on error
  */
-void print_err(info_t *info, char *estr)
+void print_error(info_t *info, char *estr)
 {
-	_sputs(info->fname);
-	_sputs(": ");
+	_eputs(info->fname);
+	_eputs(": ");
 	print_d(info->line_count, STDERR_FILENO);
-	_sputs(": ");
-	_sputs(info->argv[0]);
-	_sputs(": ");
-	_sputs(estr);
+	_eputs(": ");
+	_eputs(info->argv[0]);
+	_eputs(": ");
+	_eputs(estr);
 }
 
 /**
@@ -60,7 +60,7 @@ int print_d(int input, int fd)
 	unsigned int _abs_, current;
 
 	if (fd == STDERR_FILENO)
-		__putchar = _sputchar;
+		__putchar = _eputchar;
 	if (input < 0)
 	{
 		_abs_ = -input;
@@ -86,14 +86,14 @@ int print_d(int input, int fd)
 }
 
 /**
- * conv_num - converter function, a clone of itoa
+ * convert_number - converter function, a clone of itoa
  * @num: number
  * @base: base
  * @flags: argument flags
  *
  * Return: string
  */
-char *conv_num(long int num, int base, int flags)
+char *convert_number(long int num, int base, int flags)
 {
 	static char *array;
 	static char buffer[50];
@@ -122,12 +122,12 @@ char *conv_num(long int num, int base, int flags)
 }
 
 /**
- * rmv_comments - function replaces first instance of '#' with '\0'
+ * remove_comments - function replaces first instance of '#' with '\0'
  * @buf: address of the string to modify
  *
  * Return: Always 0;
  */
-void rmv_comments(char *buf)
+void remove_comments(char *buf)
 {
 	int i;
 
